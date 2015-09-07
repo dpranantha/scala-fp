@@ -15,8 +15,8 @@ class OperationTest extends FlatSpec with Matchers {
       val llstr = List(List("a", "b", "c"), List("d", "e"))
       val sLeaf = Leaf(None)
       val sLeaf2 = Leaf(Some(1))
-      val sBranch = Branch(Branch(Leaf(Some(9)), Leaf(None)), Branch(Leaf(Some(2)), Leaf(Some(3))))
-      val sBranches = Branch(Branch(Leaf(Some(9)), Leaf(None)), Branch(Leaf(Some(2)), Branch(Leaf(Some(3)), Leaf(Some(4)))))
+      val sBranch = Branch(Branch(Leaf(9), Leaf(1)), Branch(Leaf(2), Leaf(3)))
+      val sBranches = Branch(Branch(Leaf(9), Leaf(1)), Branch(Leaf(2), Branch(Leaf(3), Leaf(4))))
     }
 
   "removeFirst" should "remove the first element of a list" in {
@@ -123,20 +123,23 @@ class OperationTest extends FlatSpec with Matchers {
     val f = fixture
     assert(fixture.op.size(fixture.sLeaf) === 1)
     assert(fixture.op.size(fixture.sLeaf2) === 1)
+    assert(fixture.op.size(fixture.sBranch) === 7)
     assert(fixture.op.size(fixture.sBranches) === 9)
-    assert(fixture.op.countNonEmptyLeaves(fixture.sBranches) === 4)
+    assert(fixture.op.sizeTree(fixture.sBranches) === 9)
   }
   "max" should "work on tree" in {
     val f = fixture
     assert(fixture.op.maximum(fixture.sBranches) === 9)
+    assert(fixture.op.maximumTree(fixture.sBranches) === 9)
   }
   "depth" should "work on tree" in {
     val f = fixture
     assert(fixture.op.depth(fixture.sBranches) === 3)
+    assert(fixture.op.depthTree(fixture.sBranches) === 3)
   }
   "map" should "work on tree" in {
     val f = fixture
-    assert(fixture.op.mapTree(fixture.sBranch)(_ * 2) === Branch(Branch(Leaf(Some(18)), Leaf(None)), Branch(Leaf(Some(4)), Leaf(Some(6)))))
+    assert(fixture.op.mapTree(fixture.sBranch)(_ * 2) === Branch(Branch(Leaf(18), Leaf(2)), Branch(Leaf(4), Leaf(6))))
   }
 
 }

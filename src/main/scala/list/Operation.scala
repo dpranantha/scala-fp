@@ -100,14 +100,8 @@ class Operation {
     case Leaf(_) => 1
     case Branch(l, r) => 1 + size(l) + size(r)
   }
-  def countNonEmptyLeaves[A](ts: SimpleTree[A]): Int = ts match {
-    case Leaf(None) => 0
-    case Leaf(Some(_)) => 1
-    case Branch(l, r) => countNonEmptyLeaves(l) + countNonEmptyLeaves(r)
-  }
   def maximum(ts: SimpleTree[Int]): Int = ts match {
-    case Leaf(None) => Int.MinValue
-    case Leaf(Some(x)) => x
+    case Leaf(x) => x
     case Branch(l, r) => maximum(l) max maximum(r)
   }
   def depth[A](ts: SimpleTree[A]): Int = ts match {
@@ -115,8 +109,14 @@ class Operation {
     case Branch(l, r) => 1 + (depth(l) max depth(r))
   }
   def mapTree[A, B](ts: SimpleTree[A])(f: A => B): SimpleTree[B] = ts match {
-    case Leaf(None) => Leaf(None)
-    case Leaf(Some(v)) => Leaf(Some(f(v)))
+    case Leaf(v) => Leaf(f(v))
     case Branch(l, r) => Branch(mapTree(l)(f), mapTree(r)(f))
   }
+  def foldLeft[A, B](ts: SimpleTree[A], z: B)(f: (B, B) => B)(g: Leaf[A] => B): B = ts match {
+    case Leaf(v) => f(g(Leaf(v)),z)
+    case Branch(l,r) => f(foldLeft(l,z)(f)(g),foldLeft(r,z)(f)(g))
+  }
+  def sizeTree[A](ts: SimpleTree[A]):Int = foldLeft(ts,1)(_ + _)((x: Leaf[A]) => 1) 
+  def depthTree[A](ts: SimpleTree[A]): Int = foldLeft(ts,0)((a,b) => (a max b) + 1)((x: Leaf[A]) => 0)
+  def maximumTree(ts: SimpleTree[Int]):Int = foldLeft(ts,-1)(_ max _)((x: Leaf[Int]) => x.value)
 }
